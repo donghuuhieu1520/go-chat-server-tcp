@@ -61,6 +61,7 @@ func onMessage(conn net.Conn) {
 			break
 		}
 		msgCh <- msg
+		publishMessage(conn, msg)
 	}
 	closeCh <- conn
 }
@@ -73,4 +74,12 @@ func removeConn(conn net.Conn) {
 		}
 	}
 	conns = append(conns[:i], conns[i+1:]...)
+}
+
+func publishMessage(conn net.Conn, msg string) {
+	for _, c := range conns {
+		if c != conn {
+			c.Write([]byte(msg))
+		}
+	}
 }
